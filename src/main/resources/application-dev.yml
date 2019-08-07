@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+#    properties:
+#      javax:
+#        persistence:
+#          schema-generation:
+#            create-source: metadata
+#            scripts:
+#              action: create
+#              create-target: src/main/scripts/schemacreate.sql
+  datasource:
+    platform: mysql
+    url: ${CB_DB_URL}
+    username: ${CB_DB_USER_NAME}
+    password: ${CB_DB_PASSWORD}
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+
+

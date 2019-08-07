@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    platform: mysql
+    url: ${CB_DB_URL}
+    username: ${CB_DB_USER_NAME}
+    password: ${CB_DB_PASSWORD}
+    driverClassName: com.mysql.cj.jdbc.Driver
