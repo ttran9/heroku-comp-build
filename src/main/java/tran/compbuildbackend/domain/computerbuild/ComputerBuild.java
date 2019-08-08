@@ -25,6 +25,7 @@ public class ComputerBuild {
     private String name;
 
     @NotBlank
+    @Lob
     private String buildDescription;
 
     @ManyToOne(fetch = FetchType.EAGER)

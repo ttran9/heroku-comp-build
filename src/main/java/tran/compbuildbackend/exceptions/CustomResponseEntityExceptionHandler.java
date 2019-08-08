@@ -88,6 +88,9 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         if(errors.get(PURCHASE_DATE_FIELD) != null) {
             response.setPurchaseDate(errors.get(PURCHASE_DATE_FIELD));
         }
+        if(errors.get(BUILD_DESCRIPTION_FIELD) != null) {
+            response.setBuildDescription(errors.get(BUILD_DESCRIPTION_FIELD));
+        }
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

@@ -19,9 +19,11 @@ public class MultipleFieldsExceptionResponse {
 
     private String price; // although price is a double we just need an error message for the price input/field.
 
-    private String description;
+    private String description; // description for computer build details.
 
     private String purchaseDate; // purchase date.
+
+    private String buildDescription; // description for a computer build.
 
     public MultipleFieldsExceptionResponse() { }
 
@@ -103,5 +105,13 @@ public class MultipleFieldsExceptionResponse {
 
     public void setPurchaseDate(String purchaseDate) {
         this.purchaseDate = purchaseDate;
+    }
+
+    public String getBuildDescription() {
+        return buildDescription;
+    }
+
+    public void setBuildDescription(String buildDescription) {
+        this.buildDescription = buildDescription;
     }
 }
