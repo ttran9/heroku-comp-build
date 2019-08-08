@@ -11,4 +11,5 @@ public class FieldConstants {
     public static final String PLACE_PURCHASED_AT_FIELD = "placePurchasedAt";
     public static final String NAME_FIELD = "name";
     public static final String DESCRIPTION_FIELD = "description";
+    public static final String PURCHASE_DATE_FIELD = "purchaseDate";
 }

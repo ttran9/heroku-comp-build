@@ -21,6 +21,8 @@ public class MultipleFieldsExceptionResponse {
 
     private String description;
 
+    private String purchaseDate; // purchase date.
+
     public MultipleFieldsExceptionResponse() { }
 
     public String getUsername() {
@@ -95,5 +97,11 @@ public class MultipleFieldsExceptionResponse {
         this.description = description;
     }
 
+    public String getPurchaseDate() {
+        return purchaseDate;
+    }
 
+    public void setPurchaseDate(String purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
 }
