@@ -49,10 +49,11 @@ public class DirectionController {
 
     @DeleteMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)
     public ResponseEntity<?> deleteDirection(@PathVariable String uniqueIdentifier) {
-        directionService.delete(uniqueIdentifier);
+        Direction deletedDirection = directionService.delete(uniqueIdentifier);
 
         // no errors at this point with deletion so return a success message.
-        return new ResponseEntity<>(new ComputerBuildDetailResponse(DIRECTION_DELETE_MESSAGE), HttpStatus.OK);
+        return new ResponseEntity<>(new ComputerBuildDetailResponse(DIRECTION_DELETE_MESSAGE,
+                deletedDirection.getUniqueIdentifier()), HttpStatus.OK);
     }
 
     @GetMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)

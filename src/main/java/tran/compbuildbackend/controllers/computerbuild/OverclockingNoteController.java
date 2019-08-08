@@ -50,10 +50,11 @@ public class OverclockingNoteController {
 
     @DeleteMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)
     public ResponseEntity<?> deleteOverclockingNote(@PathVariable String uniqueIdentifier) {
-        overclockingNoteService.delete(uniqueIdentifier);
+        OverclockingNote deletedOverclockingNote = overclockingNoteService.delete(uniqueIdentifier);
 
         // no errors at this point with deletion so return a success message.
-        return new ResponseEntity<>(new ComputerBuildDetailResponse(OVERCLOCKING_NOTE_DELETE_MESSAGE), HttpStatus.OK);
+        return new ResponseEntity<>(new ComputerBuildDetailResponse(OVERCLOCKING_NOTE_DELETE_MESSAGE,
+                deletedOverclockingNote.getUniqueIdentifier()), HttpStatus.OK);
     }
 
     @GetMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)

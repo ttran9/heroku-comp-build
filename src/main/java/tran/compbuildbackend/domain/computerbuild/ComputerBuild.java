@@ -39,31 +39,33 @@ public class ComputerBuild {
     @OneToMany(cascade = CascadeType.REFRESH, orphanRemoval = true, mappedBy = "computerBuild", fetch = FetchType.LAZY)
     private List<Direction> directions = new LinkedList<>();
 
-    private Integer directionsCount = 0;
+    private Integer directionsInserted = 0;
 
     // a list of notes for when the computer was being built.
     @OneToMany(cascade = CascadeType.REFRESH, orphanRemoval = true, mappedBy = "computerBuild", fetch = FetchType.LAZY)
     private List<BuildNote> buildNotes = new LinkedList<>();
 
-    private Integer buildNotesCount = 0;
+    private Integer buildNotesInserted = 0;
 
     // a list of notes when attempting to overclock this computer build.
     @OneToMany(cascade = CascadeType.REFRESH, orphanRemoval = true, mappedBy = "computerBuild", fetch = FetchType.LAZY)
     private List<OverclockingNote> overclockingNotes = new LinkedList<>();
 
-    private Integer overclockingNotesCount = 0;
+    private Integer overclockingNotesInserted = 0;
 
     // a list of computer parts.
     @OneToMany(cascade = CascadeType.REFRESH, orphanRemoval = true, mappedBy = "computerBuild", fetch = FetchType.LAZY)
     private List<ComputerPart> computerParts = new LinkedList<>();
 
-    private Integer computerPartsCount = 0;
+    private Integer computerPartsInserted = 0;
 
     // a list of items that discusses the purpose of this build.
     @OneToMany(cascade = CascadeType.REFRESH, orphanRemoval = true, mappedBy = "computerBuild", fetch = FetchType.LAZY)
     private List<Purpose> purposeList = new LinkedList<>();
 
-    private Integer purposeCount = 0;
+    private Integer purposesInserted = 0;
+
+    private Double totalPrice = 0.0;
 
     @Column(unique = true)
     private String buildIdentifier;
@@ -128,12 +130,12 @@ public class ComputerBuild {
         this.directions = directions;
     }
 
-    public Integer getDirectionsCount() {
-        return directionsCount;
+    public Integer getDirectionsInserted() {
+        return directionsInserted;
     }
 
-    public void setDirectionsCount(Integer directionsCount) {
-        this.directionsCount = directionsCount;
+    public void setDirectionsInserted(Integer directionsInserted) {
+        this.directionsInserted = directionsInserted;
     }
 
     public List<BuildNote> getBuildNotes() {
@@ -144,12 +146,12 @@ public class ComputerBuild {
         this.buildNotes = buildNotes;
     }
 
-    public Integer getBuildNotesCount() {
-        return buildNotesCount;
+    public Integer getBuildNotesInserted() {
+        return buildNotesInserted;
     }
 
-    public void setBuildNotesCount(Integer buildNotesCount) {
-        this.buildNotesCount = buildNotesCount;
+    public void setBuildNotesInserted(Integer buildNotesInserted) {
+        this.buildNotesInserted = buildNotesInserted;
     }
 
     public List<OverclockingNote> getOverclockingNotes() {
@@ -160,12 +162,12 @@ public class ComputerBuild {
         this.overclockingNotes = overclockingNotes;
     }
 
-    public Integer getOverclockingNotesCount() {
-        return overclockingNotesCount;
+    public Integer getOverclockingNotesInserted() {
+        return overclockingNotesInserted;
     }
 
-    public void setOverclockingNotesCount(Integer overclockingNotesCount) {
-        this.overclockingNotesCount = overclockingNotesCount;
+    public void setOverclockingNotesInserted(Integer overclockingNotesInserted) {
+        this.overclockingNotesInserted = overclockingNotesInserted;
     }
 
     public List<ComputerPart> getComputerParts() {
@@ -176,12 +178,12 @@ public class ComputerBuild {
         this.computerParts = computerParts;
     }
 
-    public Integer getComputerPartsCount() {
-        return computerPartsCount;
+    public Integer getComputerPartsInserted() {
+        return computerPartsInserted;
     }
 
-    public void setComputerPartsCount(Integer computerPartsCount) {
-        this.computerPartsCount = computerPartsCount;
+    public void setComputerPartsInserted(Integer computerPartsInserted) {
+        this.computerPartsInserted = computerPartsInserted;
     }
 
     public List<Purpose> getPurposeList() {
@@ -192,12 +194,12 @@ public class ComputerBuild {
         this.purposeList = purposeList;
     }
 
-    public Integer getPurposeCount() {
-        return purposeCount;
+    public Integer getPurposesInserted() {
+        return purposesInserted;
     }
 
-    public void setPurposeCount(Integer purposeCount) {
-        this.purposeCount = purposeCount;
+    public void setPurposesInserted(Integer purposesInserted) {
+        this.purposesInserted = purposesInserted;
     }
 
     public String getBuildIdentifier() {
@@ -216,6 +218,14 @@ public class ComputerBuild {
         this.buildDescription = buildDescription;
     }
 
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     @Override
     public String toString() {
         return "ComputerBuild{" +
@@ -224,6 +234,7 @@ public class ComputerBuild {
                 ", buildDescription='" + buildDescription + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", totalPrice=" + totalPrice +
                 ", buildIdentifier='" + buildIdentifier + '\'' +
                 '}';
     }

@@ -96,17 +96,28 @@ public class ComputerPartServiceImplTest {
     public void updateComputerPartSuccess() {
         LoginRequest loginRequest = new LoginRequest(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, USER_PASSWORD);
         logUserIn(authenticationService, authenticationManager, jwtTokenProvider, loginRequest);
-        updateComputerPart(TEST_COMPUTER_PART_NAME, DateUtility.convertStringToDate(TEST_COMPUTER_PART_PURCHASE_DATE),
+        updateComputerPart(TEST_COMPUTER_PART_NAME, TEST_COMPUTER_PART_NAME, DateUtility.convertStringToDate(TEST_COMPUTER_PART_PURCHASE_DATE),
                 TEST_COMPUTER_PART_PLACE_PURCHASED_AT, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO,
-                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES);
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES, TEST_COMPUTER_PART_PRICE);
+        logUserOut();
+    }
+
+    @Test
+    @Transactional
+    public void updateComputerPartDifferentPricesSuccess() {
+        LoginRequest loginRequest = new LoginRequest(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, USER_PASSWORD);
+        logUserIn(authenticationService, authenticationManager, jwtTokenProvider, loginRequest);
+        updateComputerPart(TEST_COMPUTER_PART_NAME, TEST_COMPUTER_PART_NAME, DateUtility.convertStringToDate(TEST_COMPUTER_PART_PURCHASE_DATE),
+                TEST_COMPUTER_PART_PLACE_PURCHASED_AT, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO,
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES, TEST_COMPUTER_PART_PRICE_TWO);
         logUserOut();
     }
 
     @Test(expected = UsernameNotFoundException.class)
     public void updateComputerPartNotLoggedIn() {
-        updateComputerPart(TEST_COMPUTER_PART_NAME, DateUtility.convertStringToDate(TEST_COMPUTER_PART_PURCHASE_DATE),
+        updateComputerPart(TEST_COMPUTER_PART_NAME, TEST_COMPUTER_PART_NAME, DateUtility.convertStringToDate(TEST_COMPUTER_PART_PURCHASE_DATE),
                 TEST_COMPUTER_PART_PLACE_PURCHASED_AT, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO,
-                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES);
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES, TEST_COMPUTER_PART_PRICE);
     }
 
     @Transactional
@@ -114,9 +125,9 @@ public class ComputerPartServiceImplTest {
     public void updateComputerPartFailure() {
         LoginRequest loginRequest = new LoginRequest(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, USER_PASSWORD);
         logUserIn(authenticationService, authenticationManager, jwtTokenProvider, loginRequest);
-        updateComputerPart(TEST_COMPUTER_PART_NAME, DateUtility.convertStringToDate(TEST_COMPUTER_PART_PURCHASE_DATE),
-                TEST_COMPUTER_PART_PLACE_PURCHASED_AT, null,
-                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES);
+        updateComputerPart(TEST_COMPUTER_PART_NAME, TEST_COMPUTER_PART_NAME, DateUtility.convertStringToDate(TEST_COMPUTER_PART_PURCHASE_DATE),
+                TEST_COMPUTER_PART_PLACE_PURCHASED_AT, "",
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES, TEST_COMPUTER_PART_PRICE);
         logUserOut();
     }
 
@@ -129,13 +140,23 @@ public class ComputerPartServiceImplTest {
                 TEST_COMPUTER_PART_PLACE_PURCHASED_AT, TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_OTHER_NOTES);
         String computerPartIdentifier = computerPart.getUniqueIdentifier();
 
+        ComputerBuild retrievedBuild = getComputerBuildFromUser();
+
+        double oldPrice = retrievedBuild.getTotalPrice();
+
+
         ComputerPart retrievedComputerPart = computerPartRepository.getComputerPartByUniqueIdentifier(computerPartIdentifier);
         assertNotNull(retrievedComputerPart);
         computerPartService.delete(retrievedComputerPart.getUniqueIdentifier());
 
+        retrievedBuild = getComputerBuildFromUser();
+
+        double newPrice = retrievedBuild.getTotalPrice();
+
         ComputerPart nullComputerPart = computerPartRepository.getComputerPartByUniqueIdentifier(retrievedComputerPart.getUniqueIdentifier());
         assertNull(nullComputerPart);
         logUserOut();
+        assertNotEquals(oldPrice, newPrice);
     }
 
     @Transactional
@@ -186,7 +207,7 @@ public class ComputerPartServiceImplTest {
         assertEquals(computerPart.getName(), retrievedComputerPart.getName());
         assertEquals(computerPart.getPurchaseDate(), retrievedComputerPart.getPurchaseDate());
         assertEquals(computerPart.getPlacePurchasedAt(), retrievedComputerPart.getPlacePurchasedAt());
-        assertEquals(computerPart.getPrice(), retrievedComputerPart.getPrice(), 0); // the prices should match exactly so delta of 0.
+        assertEquals(computerPart.getPrice(), retrievedComputerPart.getPrice(), EXPECTED_DIFFERENCE); // the prices should match exactly so delta of 0.
         assertEquals(computerPart.getOtherNote(), retrievedComputerPart.getOtherNote());
         assertEquals(computerPart.getUniqueIdentifier(), retrievedComputerPart.getUniqueIdentifier());
         assertNotNull(computerPart.getComputerBuild());
@@ -210,14 +231,28 @@ public class ComputerPartServiceImplTest {
 
     private ComputerPart createComputerPart(String name, LocalDate localDate, String placePurchasedAt, double price,
                                             String otherNotes) {
-        Iterable<ComputerBuild> computerBuilds = computerBuildService.getAllComputerBuildsFromUser(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS);
-        ComputerBuild retrievedBuild = computerBuilds.iterator().next();
-        assertNotNull(retrievedBuild);
 
+        ComputerBuild retrievedBuild = getComputerBuildFromUser();
+
+        double oldPrice = retrievedBuild.getTotalPrice();
 
         ComputerPart computerPart = ComputerPartUtility.createComputerPart(name, localDate, placePurchasedAt, price, otherNotes);
         ComputerPart createdComputerPart = computerPartService.create(retrievedBuild.getBuildIdentifier(), computerPart);
 
+        retrievedBuild = getComputerBuildFromUser();
+
+        double newPrice = retrievedBuild.getTotalPrice();
+
+        /*
+         * it is possible the new price will match the old price because someone can insert in a product with a price of
+         * 0 such as if they got it for free from someone.
+         */
+        if(price == 0.0 || price == 0) {
+            assertEquals(oldPrice, newPrice, EXPECTED_DIFFERENCE);
+        }
+        else {
+            assertNotEquals(oldPrice, newPrice);
+        }
         assertNotNull(createdComputerPart);
         assertNotNull(createdComputerPart.getUniqueIdentifier());
         assertNotNull(createdComputerPart.getComputerBuild());
@@ -228,17 +263,44 @@ public class ComputerPartServiceImplTest {
         return createdComputerPart;
     }
 
-    private void updateComputerPart(String name, LocalDate localDate, String placePurchasedAt, String newPlacePurchasedAt,
-                                    double price, String oldNotes) {
+    private ComputerBuild getComputerBuildFromUser() {
+        Iterable<ComputerBuild> computerBuilds = computerBuildService.getAllComputerBuildsFromUser(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS);
+        // this is expected to grab the same computer build because the user specified above only has one computer build in the test profile/environment.
+        ComputerBuild retrievedBuild = computerBuilds.iterator().next();
+        assertNotNull(retrievedBuild);
+        return retrievedBuild;
+    }
+
+    private void updateComputerPart(String name, String newName, LocalDate localDate, String placePurchasedAt, String newPlacePurchasedAt,
+                                    double price, String oldNotes, double newPrice) {
         ComputerPart computerPart = createComputerPart(name, localDate, placePurchasedAt, price, oldNotes);
 
         String oldPlacePurchasedAt = computerPart.getPlacePurchasedAt();
 
         computerPart.setPlacePurchasedAt(newPlacePurchasedAt);
+        computerPart.setName(newName);
 
-        ComputerPart newComputerPart = computerPartService.update(computerPart, computerPart.getUniqueIdentifier());
+        ComputerBuild retrievedBuild = getComputerBuildFromUser();
+        double expectedPrice = retrievedBuild.getTotalPrice();
+
+        // update the contents.
+        ComputerPart updatedComputerPart = new ComputerPart(newName, newPrice, computerPart.getUniqueIdentifier(),
+                computerPart.getPurchaseDate(), newPlacePurchasedAt, computerPart.getOtherNote(),
+                computerPart.getId());
+
+        ComputerPart newComputerPart = computerPartService.update(updatedComputerPart, computerPart.getUniqueIdentifier());
         assertNotEquals(oldPlacePurchasedAt, newComputerPart.getPlacePurchasedAt());
         assertEquals(newPlacePurchasedAt, newComputerPart.getPlacePurchasedAt());
+        retrievedBuild = getComputerBuildFromUser();
+
+        double priceAfterUpdate = retrievedBuild.getTotalPrice();
+
+        if(price == newPrice) {
+            assertEquals(expectedPrice, priceAfterUpdate, EXPECTED_DIFFERENCE);
+        }
+        else {
+            assertNotEquals(expectedPrice, priceAfterUpdate);
+        }
     }
 
 }

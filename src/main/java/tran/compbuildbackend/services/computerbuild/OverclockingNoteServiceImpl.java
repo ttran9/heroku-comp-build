@@ -45,7 +45,7 @@ public class OverclockingNoteServiceImpl implements OverclockingNoteService {
     }
 
     @Override
-    public void delete(String uniqueIdentifier) {
+    public OverclockingNote delete(String uniqueIdentifier) {
         // verify that the user owns/created the overclocking note before deleting and that it is a properly formatted unique identifier.
         ComputerBuildServiceUtility.verifyComputerDetailOwner(uniqueIdentifier, computerBuildRepository);
 
@@ -53,6 +53,8 @@ public class OverclockingNoteServiceImpl implements OverclockingNoteService {
         OverclockingNote overclockingNote = getOverclockingNote(uniqueIdentifier, OVERCLOCKING_NOTE_CANNOT_BE_DELETED);
 
         overclockingNoteRepository.delete(overclockingNote);
+
+        return overclockingNote;
     }
 
     @Override

@@ -7,10 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Entity
@@ -49,13 +46,15 @@ public class ComputerPart {
     public ComputerPart() {}
 
     public ComputerPart(@NotNull String name, @Min(0) @Max(999999) double price, String uniqueIdentifier,
-                        @NotNull LocalDate purchaseDate, @NotNull String placePurchasedAt, String otherNote) {
+                        @NotNull LocalDate purchaseDate, @NotEmpty String placePurchasedAt, String otherNote,
+                        Long id) {
         this.name = name;
         this.price = price;
         this.uniqueIdentifier = uniqueIdentifier;
         this.purchaseDate = purchaseDate;
         this.placePurchasedAt = placePurchasedAt;
         this.otherNote = otherNote;
+        this.id = id;
     }
 
     public Long getId() {

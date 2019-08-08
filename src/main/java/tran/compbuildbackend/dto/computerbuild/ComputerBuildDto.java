@@ -45,6 +45,9 @@ public class ComputerBuildDto {
     // the unique of the ComputerBuild
     private String buildIdentifier;
 
+    // the total price of the computer build.
+    private Double totalPrice;
+
     public ComputerBuildDto() {
     }
 
@@ -134,5 +137,13 @@ public class ComputerBuildDto {
 
     public void setBuildIdentifier(String buildIdentifier) {
         this.buildIdentifier = buildIdentifier;
+    }
+
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

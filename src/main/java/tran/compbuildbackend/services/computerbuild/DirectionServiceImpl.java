@@ -47,7 +47,7 @@ public class DirectionServiceImpl implements DirectionService {
     }
 
     @Override
-    public void delete(String uniqueIdentifier) {
+    public Direction delete(String uniqueIdentifier) {
         // verify that the user owns/created is modifying the direction before deleting and that it is a properly formatted unique identifier.
         ComputerBuildServiceUtility.verifyComputerDetailOwner(uniqueIdentifier, computerBuildRepository);
 
@@ -55,6 +55,8 @@ public class DirectionServiceImpl implements DirectionService {
         Direction direction = getDirection(uniqueIdentifier, DIRECTION_CANNOT_BE_DELETED);
 
         directionRepository.delete(direction);
+
+        return direction;
     }
 
     @Override

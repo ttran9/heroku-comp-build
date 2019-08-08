@@ -20,8 +20,9 @@ public interface ComputerBuildDetailService<T> {
     /**
      * Deletes the detail object with the given identifier.
      * @param uniqueIdentifier The unique identifier for the detail object to be deleted.
+     * @return The deleted object.
      */
-    void delete(String uniqueIdentifier);
+    T delete(String uniqueIdentifier);
 
     /**
      * Gets the detail object with the unique identifier.

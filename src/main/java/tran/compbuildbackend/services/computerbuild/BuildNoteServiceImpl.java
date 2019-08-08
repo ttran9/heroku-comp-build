@@ -46,7 +46,7 @@ public class BuildNoteServiceImpl implements BuildNoteService {
     }
 
     @Override
-    public void delete(String noteUniqueIdentifier) {
+    public BuildNote delete(String noteUniqueIdentifier) {
         // verify that the user owns/created the build note before deleting and that it is a properly formatted unique identifier.
         ComputerBuildServiceUtility.verifyComputerDetailOwner(noteUniqueIdentifier, computerBuildRepository);
 
@@ -54,6 +54,8 @@ public class BuildNoteServiceImpl implements BuildNoteService {
         BuildNote buildNote = getBuildNote(noteUniqueIdentifier, BUILD_NOTE_CANNOT_BE_DELETED);
 
         buildNoteRepository.delete(buildNote);
+
+        return buildNote;
     }
 
     @Override

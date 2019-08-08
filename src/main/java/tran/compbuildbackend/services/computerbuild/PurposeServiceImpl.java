@@ -46,7 +46,7 @@ public class PurposeServiceImpl implements PurposeService {
     }
 
     @Override
-    public void delete(String uniqueIdentifier) {
+    public Purpose delete(String uniqueIdentifier) {
         // verify that the user owns/created the direction before deleting and that it is a properly formatted unique identifier.
         ComputerBuildServiceUtility.verifyComputerDetailOwner(uniqueIdentifier, computerBuildRepository);
 
@@ -54,6 +54,8 @@ public class PurposeServiceImpl implements PurposeService {
         Purpose purpose = getPurpose(uniqueIdentifier, PURPOSE_CANNOT_BE_DELETED);
 
         purposeRepository.delete(purpose);
+
+        return purpose;
     }
 
     @Override

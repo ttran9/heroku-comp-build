@@ -14,6 +14,7 @@ public class TestUtility {
     public static final String COMPUTER_BUILD_ID_KEY = "computerBuildId";
     public static final String DESCRIPTION_KEY = "description";
     public static final String PRIORITY_KEY = "priority";
+    public static final String TOTAL_PRICE_KEY = "totalPrice";
 
     // computer build test constants.
     public static final String SAMPLE_BUDGET_COMPUTER_BUILD_NAME = "Budget Comp Build";
@@ -45,8 +46,10 @@ public class TestUtility {
     public static final String TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO = "Livermore Bestbuy";
     public static final String TEST_COMPUTER_PART_OTHER_NOTES = "This is a really good processor for high performance (not the top tier) gaming. This is also very good for hobbyists using productivity or light video editing/content production.";
     public static final double TEST_COMPUTER_PART_PRICE = 330.00;
+    public static final double TEST_COMPUTER_PART_PRICE_TWO = 320.00;
     public static final double TEST_COMPUTER_PART_PRICE_TOO_HIGH = 10000000.00;
     public static final double TEST_COMPUTER_PART_PRICE_IMPROPER_FORMAT = 500.0001;
+    public static final double EXPECTED_DIFFERENCE = 0;
 
     // direction constants for testing.
     public static final String TEST_DIRECTION_DESCRIPTION = "This is the first direction step.";

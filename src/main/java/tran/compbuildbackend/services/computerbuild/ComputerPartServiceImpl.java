@@ -30,8 +30,12 @@ public class ComputerPartServiceImpl implements ComputerPartService {
 
         computerPart.setUniqueIdentifier(ComputerBuildServiceUtility.generateComputerBuildDetail(
                 COMPUTER_PART_ABBREVIATION, retrievedComputerBuild));
+
+        // ensure the computer build's price is updated before persisting to the db.
+        retrievedComputerBuild.setTotalPrice(retrievedComputerBuild.getTotalPrice() + computerPart.getPrice());
         computerPart.setComputerBuild(retrievedComputerBuild);
 
+        // persist the computer part.
         return computerPartRepository.save(computerPart);
     }
 
@@ -39,22 +43,30 @@ public class ComputerPartServiceImpl implements ComputerPartService {
     @Override
     public ComputerPart update(ComputerPart newComputerPart, String uniqueIdentifier) {
         // verify that the owner is modifying the computer part and that it is a properly formatted unique identifier.
-        ComputerBuildServiceUtility.verifyComputerDetailOwner(uniqueIdentifier, computerBuildRepository);
+        ComputerBuild computerBuild = ComputerBuildServiceUtility.verifyComputerDetailOwner(uniqueIdentifier, computerBuildRepository);
 
-        getComputerPart(uniqueIdentifier, COMPUTER_PART_CANNOT_BE_UPDATED);
+        ComputerPart oldComputerPart = getComputerPart(uniqueIdentifier, COMPUTER_PART_CANNOT_BE_UPDATED);
+
+        updateComputerBuildCost(computerBuild, oldComputerPart, newComputerPart);
 
         return computerPartRepository.save(newComputerPart);
     }
 
     @Override
-    public void delete(String uniqueIdentifier) {
+    public ComputerPart delete(String uniqueIdentifier) {
         // verify that the user owns/created the computer part before deleting and that it is a properly formatted unique identifier.
-        ComputerBuildServiceUtility.verifyComputerDetailOwner(uniqueIdentifier, computerBuildRepository);
+        ComputerBuild retrievedComputerBuild = ComputerBuildServiceUtility.verifyComputerDetailOwner(uniqueIdentifier, computerBuildRepository);
 
         // verify if the unique identifier points to the object to be updated.
         ComputerPart computerPart = getComputerPart(uniqueIdentifier, COMPUTER_PART_CANNOT_BE_DELETED);
 
+        retrievedComputerBuild.setTotalPrice(retrievedComputerBuild.getTotalPrice() - computerPart.getPrice());
+        computerPart.setComputerBuild(retrievedComputerBuild);
+
+        // remove the computer part.
         computerPartRepository.delete(computerPart);
+
+        return computerPart;
     }
 
     @Override
@@ -71,4 +83,15 @@ public class ComputerPartServiceImpl implements ComputerPartService {
         }
         return computerPart;
     }
+
+    private void updateComputerBuildCost(ComputerBuild computerBuild, ComputerPart oldComputerPart, ComputerPart newComputerPart) {
+        // ensure the computer build's price is updated before persisting to the db.
+        double totalPrice = computerBuild.getTotalPrice();
+        totalPrice -= (oldComputerPart.getPrice() - newComputerPart.getPrice());
+        computerBuild.setTotalPrice(totalPrice);
+
+        // update the computer build and link the new computer part to it.
+        newComputerPart.setComputerBuild(computerBuild);
+    }
+
 }

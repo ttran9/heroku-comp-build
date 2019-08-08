@@ -58,8 +58,8 @@ public abstract class AbstractNote {
 
     public AbstractNote() { }
 
-    public AbstractNote(@Min(1) @Max(3) int priority, @NotNull String description, LocalDate createdAt,
-                        LocalDate updatedAt, ComputerBuild computerBuild) {
+    public AbstractNote(@Min(1) @Max(3) int priority, @NotBlank String description, LocalDate createdAt,
+                        LocalDate updatedAt) {
         this.priority = priority;
         this.description = description;
         this.createdAt = createdAt;

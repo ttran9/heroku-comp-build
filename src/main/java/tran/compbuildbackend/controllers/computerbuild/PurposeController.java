@@ -50,10 +50,11 @@ public class PurposeController {
 
     @DeleteMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)
     public ResponseEntity<?> deletePurpose(@PathVariable String uniqueIdentifier) {
-        purposeService.delete(uniqueIdentifier);
+        Purpose deletedPurpose = purposeService.delete(uniqueIdentifier);
 
         // no errors at this point with deletion so return a success message.
-        return new ResponseEntity<>(new ComputerBuildDetailResponse(PURPOSE_DELETE_MESSAGE), HttpStatus.OK);
+        return new ResponseEntity<>(new ComputerBuildDetailResponse(PURPOSE_DELETE_MESSAGE,
+                deletedPurpose.getUniqueIdentifier()), HttpStatus.OK);
     }
 
     @GetMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)

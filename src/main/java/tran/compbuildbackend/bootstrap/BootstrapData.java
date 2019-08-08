@@ -72,10 +72,7 @@ public class BootstrapData implements ApplicationListener<ContextRefreshedEvent>
         createSampleComputerBuilds();
         logUserOut();
 
-        loginRequest = new LoginRequest(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, USER_PASSWORD);
-        logUserIn(authenticationService, authenticationManager, jwtTokenProvider, loginRequest);
         createComputerBuildsWithNoDetails();
-        logUserOut();
     }
 
     private void createUsers() {
@@ -96,6 +93,10 @@ public class BootstrapData implements ApplicationListener<ContextRefreshedEvent>
         ApplicationUser userForSecondLogin = createUser(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, EMAIL_TO_TEST_OWNERSHIP_ENDPOINTS,
                 USER_PASSWORD, FULL_NAME);
 
+        // a user account used to login as a second user when trying operations that require an original owner.
+        ApplicationUser userForThirdLogin = createUser(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS, EMAIL_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS,
+                USER_PASSWORD, FULL_NAME_CONTROLLERS);
+
         // save/create users
         applicationUserService.persistUser(user, null);
         applicationUserService.enableUser(user);
@@ -108,6 +109,9 @@ public class BootstrapData implements ApplicationListener<ContextRefreshedEvent>
 
         applicationUserService.persistUser(userForSecondLogin, null);
         applicationUserService.enableUser(userForSecondLogin);
+
+        applicationUserService.persistUser(userForThirdLogin, null);
+        applicationUserService.enableUser(userForThirdLogin);
 
 
     }
@@ -186,8 +190,16 @@ public class BootstrapData implements ApplicationListener<ContextRefreshedEvent>
 
     private void createComputerBuildsWithNoDetails() {
         // create a computer build with a name a description but empty lists of details.
+        LoginRequest loginRequest = new LoginRequest(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, USER_PASSWORD);
+        logUserIn(authenticationService, authenticationManager, jwtTokenProvider, loginRequest);
         createSampleBuildWithEmptySubLists(FIRST_TEST_BUILD_NAME, FIRST_TEST_BUILD_DESCRIPTION);
+        logUserOut();
+
+        loginRequest = new LoginRequest(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS, USER_PASSWORD);
+        logUserIn(authenticationService, authenticationManager, jwtTokenProvider, loginRequest);
         createSampleBuildWithEmptySubLists(SECOND_TEST_BUILD_NAME, SECOND_TEST_BUILD_DESCRIPTION);
+        logUserOut();
+
     }
 
     private void createSampleBuildWithEmptySubLists(String buildName, String buildDescription) {

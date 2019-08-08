@@ -38,9 +38,13 @@ public class UserConstants {
     public static final String USER_NAME_TO_CREATE_NEW_USER = "toddtran20";
     public static final String USER_EMAIL_TO_CREATE_NEW_USER = "toddtran20@gmail.com";
 
+    public static final String FULL_NAME_CONTROLLERS = "Toby Flenderson";
+
     // the below is used to do the login for the tests to get the jwt token to test the controllers (except the user controller).
     public static final String ANOTHER_USER_NAME_TO_CREATE_NEW_USER = "toddtran21";
     public static final String ANOTHER_EMAIL_TO_CREATE_NEW_USER = "toddtran21@gmail.com";
     public static final String USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS = "vacuumluigi";
     public static final String EMAIL_TO_TEST_OWNERSHIP_ENDPOINTS = "vacuumluigi@yahoo.com";
+    public static final String USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS = "tester";
+    public static final String EMAIL_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS = "tester@test.com";
 }

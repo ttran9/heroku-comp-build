@@ -30,10 +30,10 @@ public class ComputerBuildDetailUtility {
     /*
      * method to create a note and verifies some of its fields.
      */
-    public static AbstractNote createNote(String content, String createDirectionBuildURL, int expectedStatusCode,
+    public static AbstractNote createNote(String content, String createNoteBuildURL, int expectedStatusCode,
                                            String token, TestRestTemplate restTemplate, String noteType,
                                             String expectedDescription, int expectedPriority) throws Exception {
-        Object response = createRequest(createDirectionBuildURL, WebUtility.getEntityWithToken(content, token), expectedStatusCode,
+        Object response = createRequest(createNoteBuildURL, WebUtility.getEntityWithToken(content, token), expectedStatusCode,
                 HttpMethod.POST, restTemplate);
         LinkedHashMap contents = (LinkedHashMap) response;
         String json = new Gson().toJson(contents, LinkedHashMap.class);
@@ -104,14 +104,12 @@ public class ComputerBuildDetailUtility {
     /*
      * method to set the computer build identifier to be able to attempt to modify (a) part(s) of a computer build.
      */
-    public static String setComputerBuildIdentifier(TestRestTemplate restTemplate) throws Exception {
+    public static LinkedHashMap getComputerBuildIdentifier(TestRestTemplate restTemplate, String computerBuildUserName) throws Exception {
         String getAllComputerBuildsURL = BASE_URL + COMPUTER_BUILD_API;
-        String getAllComputerBuildsFromUserURL = getAllComputerBuildsURL + USER_NAME_REQUEST + USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS;
+        String getAllComputerBuildsFromUserURL = getAllComputerBuildsURL + USER_NAME_REQUEST + computerBuildUserName;
         Object builds = createRequest(getAllComputerBuildsFromUserURL, WebUtility.getEntity(null), HttpStatus.OK.value(), HttpMethod.GET, restTemplate);
         List<LinkedHashMap> computerBuilds = (List<LinkedHashMap>) builds;
-        LinkedHashMap contents = computerBuilds.get(computerBuilds.size()-1);
-
-        return (String) contents.get(BUILD_IDENTIFIER_KEY);
+        return computerBuilds.get(computerBuilds.size()-1);
     }
 
 

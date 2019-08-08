@@ -43,8 +43,9 @@ public class OverclockingNoteControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        token = loginHelper(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, USER_PASSWORD, restTemplate);
-        computerBuildIdentifier = setComputerBuildIdentifier(restTemplate);
+        token = loginHelper(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS, USER_PASSWORD, restTemplate);
+        LinkedHashMap contents = getComputerBuildIdentifier(restTemplate, USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS);
+        computerBuildIdentifier = (String) contents.get(BUILD_IDENTIFIER_KEY);
     }
 
     /*

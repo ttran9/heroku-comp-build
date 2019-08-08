@@ -49,10 +49,11 @@ public class BuildNoteController {
 
     @DeleteMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)
     public ResponseEntity<?> deleteBuildNote(@PathVariable String uniqueIdentifier) {
-        buildNoteService.delete(uniqueIdentifier);
+        BuildNote deletedBuildNote = buildNoteService.delete(uniqueIdentifier);
 
         // no errors at this point with deletion so return a success message.
-        return new ResponseEntity<>(new ComputerBuildDetailResponse(BUILD_NOTE_DELETE_MESSAGE), HttpStatus.OK);
+        return new ResponseEntity<>(new ComputerBuildDetailResponse(BUILD_NOTE_DELETE_MESSAGE,
+                deletedBuildNote.getUniqueIdentifier()), HttpStatus.OK);
     }
 
     @GetMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)

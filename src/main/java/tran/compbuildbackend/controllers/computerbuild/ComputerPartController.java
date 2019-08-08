@@ -59,10 +59,11 @@ public class ComputerPartController {
 
     @DeleteMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)
     public ResponseEntity<?> deleteComputerPart(@PathVariable String uniqueIdentifier, @PathVariable String buildIdentifier) {
-        computerPartService.delete(uniqueIdentifier);
+        ComputerPart deletedComputerPart = computerPartService.delete(uniqueIdentifier);
 
         // no errors at this point with deletion so return a success message.
-        return new ResponseEntity<>(new ComputerBuildDetailResponse(COMPUTER_PART_DELETE_MESSAGE), HttpStatus.OK);
+        return new ResponseEntity<>(new ComputerBuildDetailResponse(COMPUTER_PART_DELETE_MESSAGE, uniqueIdentifier,
+                deletedComputerPart.getPrice()), HttpStatus.OK);
     }
 
     @GetMapping(BUILD_IDENTIFIER_PATH_VARIABLE + URL_SEPARATOR + UNIQUE_IDENTIFIER_PATH_VARIABLE)

@@ -48,8 +48,9 @@ public class ComputerPartControllerIntegrationTest {
 
     @Before
     public void setUp() throws Exception {
-        token = loginHelper(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS, USER_PASSWORD, restTemplate);
-        computerBuildIdentifier = setComputerBuildIdentifier(restTemplate);
+        token = loginHelper(USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS, USER_PASSWORD, restTemplate);
+        LinkedHashMap contents = getComputerBuildIdentifier(restTemplate, USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS);
+        computerBuildIdentifier = (String) contents.get(BUILD_IDENTIFIER_KEY);
     }
 
     /*
@@ -57,7 +58,7 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void testCreateComputerPartSuccess() throws Exception {
-        generateComputerPart();
+        generateComputerPart(TEST_COMPUTER_PART_PRICE);
     }
 
     /*
@@ -108,11 +109,24 @@ public class ComputerPartControllerIntegrationTest {
 }
 
     /*
-     * testing a successful computer part upgrade.
+     * testing a successful computer part upgrade where there is a price update.
      */
     @Test
-    public void upgradeComputerPartSuccess() throws Exception {
-        ComputerPart response = (ComputerPart) updateComputerPart(false, true, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO);
+    public void upgradeComputerPartPriceUpdateSuccess() throws Exception {
+        ComputerPart response = (ComputerPart) updateComputerPart(false, true, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO,
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_PRICE_TWO);
+        assertNotNull(response);
+        assertNotEquals(TEST_COMPUTER_PART_PLACE_PURCHASED_AT, response.getPlacePurchasedAt());
+        assertEquals(TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO, response.getPlacePurchasedAt());
+    }
+
+    /*
+     * testing a successful computer part upgrade where there is no price update.
+     */
+    @Test
+    public void upgradeComputerPartNoPriceUpdateSuccess() throws Exception {
+        ComputerPart response = (ComputerPart) updateComputerPart(false, true, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO,
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_PRICE);
         assertNotNull(response);
         assertNotEquals(TEST_COMPUTER_PART_PLACE_PURCHASED_AT, response.getPlacePurchasedAt());
         assertEquals(TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO, response.getPlacePurchasedAt());
@@ -123,7 +137,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void upgradeComputerPartNotAsOwner() throws Exception {
-        LinkedHashMap responseContent = (LinkedHashMap) updateComputerPart(true, false, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO);
+        LinkedHashMap responseContent = (LinkedHashMap) updateComputerPart(true, false, TEST_COMPUTER_PART_PLACE_PURCHASED_AT_TWO,
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_PRICE_TWO);
         assertNotNull(responseContent);
         assertNotNull(responseContent.get(MESSAGE_KEY));
         assertEquals(COMPUTER_BUILD_CANNOT_BE_MODIFIED, responseContent.get(MESSAGE_KEY));
@@ -134,7 +149,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void upgradeComputerPartFailure() throws Exception {
-        LinkedHashMap responseContent = (LinkedHashMap) updateComputerPart(false, false, null);
+        LinkedHashMap responseContent = (LinkedHashMap) updateComputerPart(false, false, null,
+                TEST_COMPUTER_PART_PRICE, TEST_COMPUTER_PART_PRICE_TWO);
         assertNotNull(responseContent);
         assertNotNull(responseContent.get(PLACE_PURCHASED_AT_KEY));
         assertEquals(FIELD_CANNOT_BE_EMPTY, responseContent.get(PLACE_PURCHASED_AT_KEY));
@@ -145,8 +161,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void deleteComputerPartSuccess() throws Exception {
-        LinkedHashMap contents = createDirectionRequest(false, HttpMethod.DELETE, HttpStatus.OK.value(),
-                true, true);
+        LinkedHashMap contents = createComputerPartRequest(false, HttpMethod.DELETE, HttpStatus.OK.value(),
+                true, true, TEST_COMPUTER_PART_PRICE);
         assertNotNull(contents.get(MESSAGE_KEY));
         assertEquals(contents.get(MESSAGE_KEY), COMPUTER_PART_DELETE_MESSAGE);
     }
@@ -156,8 +172,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void deleteComputerPartNotAsOwner() throws Exception {
-        LinkedHashMap contents = createDirectionRequest(true, HttpMethod.DELETE, HttpStatus.BAD_REQUEST.value(),
-                true, false);
+        LinkedHashMap contents = createComputerPartRequest(true, HttpMethod.DELETE, HttpStatus.BAD_REQUEST.value(),
+                true, false, TEST_COMPUTER_PART_PRICE);
         assertNotNull(contents.get(MESSAGE_KEY));
         assertEquals(contents.get(MESSAGE_KEY), COMPUTER_BUILD_CANNOT_BE_MODIFIED);
     }
@@ -168,8 +184,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void deleteComputerPartFailure() throws Exception {
-        LinkedHashMap contents = createDirectionRequest(false, HttpMethod.DELETE, HttpStatus.BAD_REQUEST.value(),
-                true, false);
+        LinkedHashMap contents = createComputerPartRequest(false, HttpMethod.DELETE, HttpStatus.BAD_REQUEST.value(),
+                true, false, TEST_COMPUTER_PART_PRICE);
         assertNotNull(contents.get(MESSAGE_KEY));
         assertEquals(contents.get(MESSAGE_KEY), COMPUTER_PART_CANNOT_BE_DELETED);
     }
@@ -179,8 +195,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void getComputerPartLoggedInSuccess() throws Exception {
-        LinkedHashMap contents = createDirectionRequest(false, HttpMethod.GET, HttpStatus.OK.value(),
-                true, true);
+        LinkedHashMap contents = createComputerPartRequest(false, HttpMethod.GET, HttpStatus.OK.value(),
+                true, true, TEST_COMPUTER_PART_PRICE);
         assertEquals(TEST_COMPUTER_PART_NAME, contents.get(NAME_KEY));
         assertEquals(TEST_COMPUTER_PART_PURCHASE_DATE, contents.get(PURCHASE_DATE_KEY));
         assertEquals(TEST_COMPUTER_PART_PLACE_PURCHASED_AT, contents.get(PLACE_PURCHASED_AT_KEY));
@@ -195,8 +211,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void getComputerPartNotLoggedInSuccess() throws Exception {
-        LinkedHashMap contents = createDirectionRequest(false, HttpMethod.GET, HttpStatus.OK.value(),
-                false, true);
+        LinkedHashMap contents = createComputerPartRequest(false, HttpMethod.GET, HttpStatus.OK.value(),
+                false, true, TEST_COMPUTER_PART_PRICE);
         assertEquals(TEST_COMPUTER_PART_NAME, contents.get(NAME_KEY));
         assertEquals(TEST_COMPUTER_PART_PURCHASE_DATE, contents.get(PURCHASE_DATE_KEY));
         assertEquals(TEST_COMPUTER_PART_PLACE_PURCHASED_AT, contents.get(PLACE_PURCHASED_AT_KEY));
@@ -212,8 +228,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void getComputerPartLoggedInFailure() throws Exception {
-        LinkedHashMap contents = createDirectionRequest(false, HttpMethod.GET, HttpStatus.BAD_REQUEST.value(),
-                true, false);
+        LinkedHashMap contents = createComputerPartRequest(false, HttpMethod.GET, HttpStatus.BAD_REQUEST.value(),
+                true, false, TEST_COMPUTER_PART_PRICE);
         assertEquals(INVALID_COMPUTER_PART, contents.get(MESSAGE_KEY));
     }
 
@@ -223,8 +239,8 @@ public class ComputerPartControllerIntegrationTest {
      */
     @Test
     public void getComputerPartNotLoggedInFailure() throws Exception {
-        LinkedHashMap contents = createDirectionRequest(false, HttpMethod.GET, HttpStatus.BAD_REQUEST.value(),
-                false, false);
+        LinkedHashMap contents = createComputerPartRequest(false, HttpMethod.GET, HttpStatus.BAD_REQUEST.value(),
+                false, false, TEST_COMPUTER_PART_PRICE);
         assertEquals(INVALID_COMPUTER_PART, contents.get(MESSAGE_KEY));
     }
 
@@ -240,6 +256,7 @@ public class ComputerPartControllerIntegrationTest {
      * helper method to create a computer part and verify some of its fields.
      */
     private ComputerPart createComputerPart(String content, String createComputerBuildURL, int expectedStatusCode) throws Exception {
+        double priceBeforeInsertion = getComputerBuildTotalPrice();
         Object response = createRequest(createComputerBuildURL, WebUtility.getEntityWithToken(content, token),
                 expectedStatusCode, HttpMethod.POST, restTemplate);
         LinkedHashMap contents = (LinkedHashMap) response;
@@ -247,6 +264,7 @@ public class ComputerPartControllerIntegrationTest {
         String json = gson.toJson(contents,LinkedHashMap.class);
         ObjectMapper objectMapper = new ObjectMapper();
         ComputerPart computerPart = objectMapper.readValue(json, ComputerPart.class);
+        double priceAfterInsertion = getComputerBuildTotalPrice();
 
         assertEquals(TEST_COMPUTER_PART_NAME, computerPart.getName());
         assertEquals(TEST_COMPUTER_PART_PURCHASE_DATE, convertDateToString(computerPart.getPurchaseDate()));
@@ -255,15 +273,16 @@ public class ComputerPartControllerIntegrationTest {
         assertEquals(TEST_COMPUTER_PART_PRICE, computerPart.getPrice(), 0);
         assertNotNull(computerPart.getId());
         assertNotNull(computerPart.getUniqueIdentifier());
+        assertNotEquals(priceBeforeInsertion, priceAfterInsertion);
        return computerPart;
     }
 
     /*
      * helper method to persist/create a computer part object for testing.
      */
-    private ComputerPart generateComputerPart() throws Exception {
+    private ComputerPart generateComputerPart(double price) throws Exception {
         String content = ComputerPartUtility.getComputerPartAsJson(TEST_COMPUTER_PART_NAME, TEST_COMPUTER_PART_PURCHASE_DATE,
-                TEST_COMPUTER_PART_PLACE_PURCHASED_AT, TEST_COMPUTER_PART_OTHER_NOTES, TEST_COMPUTER_PART_PRICE);
+                TEST_COMPUTER_PART_PLACE_PURCHASED_AT, TEST_COMPUTER_PART_OTHER_NOTES, price);
         String createComputerPartBuildURL = BASE_URL + COMPUTER_PART_API + computerBuildIdentifier;
         return createComputerPart(content, createComputerPartBuildURL, HttpStatus.CREATED.value());
     }
@@ -290,8 +309,13 @@ public class ComputerPartControllerIntegrationTest {
     /*
      * helper method to update a computer part for successful and failing cases.
      */
-    private Object updateComputerPart(boolean logInSecondTime, boolean isSuccessfulUpdate, String placePurchasedAt) throws Exception {
-        ComputerPart computerPart = generateComputerPart();
+    private Object updateComputerPart(boolean logInSecondTime, boolean isSuccessfulUpdate, String placePurchasedAt,
+                                      double price, double newPrice) throws Exception {
+        ComputerPart computerPart = generateComputerPart(price);
+
+        // grab old computer build by identifier and get the price.
+        // this will be the expected price (which should change when we check it if we have a successful deletion).
+        double priceBeforeUpdate = getComputerBuildTotalPrice();
 
         if(logInSecondTime) {
             // log in as someone else..
@@ -302,23 +326,38 @@ public class ComputerPartControllerIntegrationTest {
         String updateComputerPartURL = BASE_URL + COMPUTER_PART_API + computerBuildIdentifier + URL_SEPARATOR + computerPartIdentifier;
         // update the computer part that was created above.
         String content = ComputerPartUtility.getComputerPartAsJson(TEST_COMPUTER_PART_NAME, TEST_COMPUTER_PART_PURCHASE_DATE,
-                placePurchasedAt, TEST_COMPUTER_PART_OTHER_NOTES, TEST_COMPUTER_PART_PRICE,
+                placePurchasedAt, TEST_COMPUTER_PART_OTHER_NOTES, newPrice,
                 computerBuildIdentifier, computerPart.getId(), computerPartIdentifier);
 
-        return isSuccessfulUpdate ? updateRequestSuccess(updateComputerPartURL, WebUtility.getEntityWithToken(content, token)) :
-            updateRequest(updateComputerPartURL, WebUtility.getEntityWithToken(content, token), restTemplate);
+        if(isSuccessfulUpdate) {
+            ComputerPart updatedComputerPart = updateRequestSuccess(updateComputerPartURL, WebUtility.getEntityWithToken(content, token));
+            double priceAfterUpdate = getComputerBuildTotalPrice();
+            if(price != newPrice) {
+                assertNotEquals(priceBeforeUpdate, priceAfterUpdate);
+            }
+            else {
+                assertEquals(priceBeforeUpdate, priceAfterUpdate, EXPECTED_DIFFERENCE);
+            }
+            return updatedComputerPart;
+        }
+         else {
+            return updateRequest(updateComputerPartURL, WebUtility.getEntityWithToken(content, token), restTemplate);
+        }
+//        return isSuccessfulUpdate ? updateRequestSuccess(updateComputerPartURL, WebUtility.getEntityWithToken(content, token)) :
+//            updateRequest(updateComputerPartURL, WebUtility.getEntityWithToken(content, token), restTemplate);
     }
 
     /*
      * helper method to get or delete a computer part.
      */
-    private LinkedHashMap createDirectionRequest(boolean logInSecondTime, HttpMethod httpMethod, int expectedStatusCode,
-                                                 boolean loggedIn, boolean isSuccess) throws Exception {
-        ComputerPart computerPart = generateComputerPart();
+    private LinkedHashMap createComputerPartRequest(boolean logInSecondTime, HttpMethod httpMethod, int expectedStatusCode,
+                                                 boolean loggedIn, boolean isSuccess, double price) throws Exception {
+        ComputerPart computerPart = generateComputerPart(price);
 
         if(logInSecondTime) {
             token = loginHelper(ANOTHER_USER_NAME_TO_CREATE_NEW_USER, USER_PASSWORD, restTemplate);
         }
+        double priceBeforeDeletion = getComputerBuildTotalPrice();
         String uniqueIdentifier = computerPart.getUniqueIdentifier();
         String url = isSuccess ? BASE_URL + COMPUTER_PART_API + computerBuildIdentifier + URL_SEPARATOR + uniqueIdentifier :
                 BASE_URL + COMPUTER_PART_API + computerBuildIdentifier + URL_SEPARATOR + uniqueIdentifier + INVALID_IDENTIFIER_SUFFIX;
@@ -328,6 +367,21 @@ public class ComputerPartControllerIntegrationTest {
         assertNotNull(response);
         LinkedHashMap contents = (LinkedHashMap) response;
         assertNotNull(contents);
+
+        /*
+         * if successful delete grab the new price and compare it to the old/expected price and make sure they are not the same
+         * UNLESS the old part does not cost anything which is possible if someone got it for free such as through a friend.
+         */
+        if(isSuccess && httpMethod == HttpMethod.DELETE) {
+            double priceAfterDeletion = getComputerBuildTotalPrice();
+            assertNotEquals(priceBeforeDeletion, priceAfterDeletion);
+        }
+
         return contents;
+    }
+
+    private double getComputerBuildTotalPrice() throws Exception{
+        LinkedHashMap newComputerBuildResponse = getComputerBuildIdentifier(restTemplate, USER_NAME_TO_TEST_OWNERSHIP_ENDPOINTS_CONTROLLERS);
+        return (Double) newComputerBuildResponse.get(TOTAL_PRICE_KEY);
     }
 }
