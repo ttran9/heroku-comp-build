@@ -44,7 +44,7 @@ public class JwtTokenProvider {
                 .setSubject(userId)
                 .setClaims(claims)
                 .setIssuedAt(currentDate)
-                .setExpiration(expirationDate)
+                //                .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
     }
